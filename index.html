@@ -869,7 +869,7 @@
 		try {
 		  // Create Gmail web compose link
 			const gmailSubject = encodeURIComponent(subject);
-			const gmailBody = encodeURIComponent(`Message from my portfolio\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+			const gmailBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
 			const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=shaleelsandeepa@gmail.com&su=${gmailSubject}&body=${gmailBody}`;
 			
 			// Open Gmail in new tab/window
