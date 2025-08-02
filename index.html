@@ -674,28 +674,52 @@
 
         <div class="row no-gutters block-9">
           <div class="col-md-6 order-md-last d-flex">
-            <form action="#" class="bg-light p-4 p-md-5 contact-form">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Your Name">
+            <form id="contact-form" class="enhanced-contact-form bg-light p-4 p-md-5 contact-form">
+              <div class="form-header mb-4">
+                <h3 class="form-title">Let's Get In Touch!</h3>
+                <p class="form-subtitle">Send me a message and I'll get back to you as soon as possible.</p>
               </div>
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Your Email">
+              
+              <div class="form-group floating-label">
+                <input type="text" id="user_name" name="user_name" class="form-control floating-input" placeholder=" " required>
+                <label for="user_name" class="floating-label-text">Your Name</label>
+                <i class="form-icon icon-user"></i>
               </div>
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Subject">
+              
+              <div class="form-group floating-label">
+                <input type="email" id="user_email" name="user_email" class="form-control floating-input" placeholder=" " required>
+                <label for="user_email" class="floating-label-text">Your Email</label>
+                <i class="form-icon icon-envelope"></i>
               </div>
-              <div class="form-group">
-                <textarea name="" id="" cols="30" rows="7" class="form-control" placeholder="Message"></textarea>
+              
+              <div class="form-group floating-label">
+                <input type="text" id="subject" name="subject" class="form-control floating-input" placeholder=" " required>
+                <label for="subject" class="floating-label-text">Subject</label>
+                <i class="form-icon icon-tag"></i>
               </div>
-              <div class="form-group">
-                <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
+              
+              <div class="form-group floating-label">
+                <textarea id="message" name="message" cols="30" rows="7" class="form-control floating-input" placeholder=" " required></textarea>
+                <label for="message" class="floating-label-text">Message</label>
+                <i class="form-icon icon-comment"></i>
               </div>
+              
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary enhanced-btn py-3 px-5">
+                  <span class="btn-text">Send Message</span>
+                  <span class="btn-loader" style="display: none;">
+                    <i class="icon-spinner"></i> Sending...
+                  </span>
+                </button>
+              </div>
+              
+              <div id="form-status" class="form-status" style="display: none;"></div>
             </form>
           
           </div>
 
           <div class="col-md-6 d-flex">
-          	<div class="img" style="background-image: url(images/about.jpg);"></div>
+          	<div class="img enhanced-contact-bg" style="background-image: url(images/bg_1.jpg);"></div>
           </div>
         </div>
       </div>
@@ -789,7 +813,116 @@
   <script src="js/jquery.animateNumber.min.js"></script>
   <script src="js/scrollax.min.js"></script>
   
+  <!-- EmailJS -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  
   <script src="js/main.js"></script>
+  
+  <!-- Contact Form Script -->
+  <script>
+    // Contact form handler with multiple email service options
+    document.getElementById('contact-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const form = this;
+      const submitBtn = form.querySelector('.enhanced-btn');
+      const btnText = submitBtn.querySelector('.btn-text');
+      const btnLoader = submitBtn.querySelector('.btn-loader');
+      const statusDiv = document.getElementById('form-status');
+      
+      // Show loading state
+      btnText.style.display = 'none';
+      btnLoader.style.display = 'inline-block';
+      submitBtn.disabled = true;
+      statusDiv.style.display = 'none';
+      
+      // Get form data
+      const formData = new FormData(form);
+      
+      // Option 1: Using Formspree (Recommended - Easy Setup)
+      // Visit https://formspree.io, create account, get your form endpoint
+      fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      }).then(response => {
+        if (response.ok) {
+          showStatus('success', 'Thank you! Your message has been sent successfully. I\'ll get back to you soon.');
+          form.reset();
+          // Remove focused class from all floating labels
+          document.querySelectorAll('.floating-label').forEach(label => {
+            label.classList.remove('focused');
+          });
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      }).catch(error => {
+        console.log('Error:', error);
+        // Fallback to mailto
+        const name = form.user_name.value;
+        const email = form.user_email.value;
+        const subject = form.subject.value;
+        const message = form.message.value;
+        
+        const mailtoLink = `mailto:shaleelsandeepa@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+        window.location.href = mailtoLink;
+        
+        showStatus('success', 'Your email client should open now. If not, please send an email directly to shaleelsandeepa@gmail.com');
+      }).finally(() => {
+        // Reset button state
+        btnText.style.display = 'inline-block';
+        btnLoader.style.display = 'none';
+        submitBtn.disabled = false;
+      });
+    });
+    
+    function showStatus(type, message) {
+      const statusDiv = document.getElementById('form-status');
+      statusDiv.className = 'form-status ' + type;
+      statusDiv.innerHTML = message;
+      statusDiv.style.display = 'block';
+      
+      // Auto hide after 6 seconds
+      setTimeout(function() {
+        statusDiv.style.display = 'none';
+      }, 6000);
+    }
+    
+    // Floating label animation
+    document.querySelectorAll('.floating-input').forEach(function(input) {
+      input.addEventListener('focus', function() {
+        this.parentElement.classList.add('focused');
+      });
+      
+      input.addEventListener('blur', function() {
+        if (!this.value) {
+          this.parentElement.classList.remove('focused');
+        }
+      });
+      
+      // Check on page load for pre-filled values
+      if (input.value) {
+        input.parentElement.classList.add('focused');
+      }
+    });
+    
+    // Add form validation styling
+    document.querySelectorAll('.floating-input').forEach(function(input) {
+      input.addEventListener('invalid', function() {
+        this.style.borderColor = '#dc3545';
+      });
+      
+      input.addEventListener('input', function() {
+        if (this.checkValidity()) {
+          this.style.borderColor = '#28a745';
+        } else {
+          this.style.borderColor = '#dc3545';
+        }
+      });
+    });
+  </script>
     
   </body>
 </html>
