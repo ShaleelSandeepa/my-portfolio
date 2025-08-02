@@ -24,14 +24,16 @@ document.getElementById('contact-form').addEventListener('submit', function(even
   
   // Simulate sending (replace with actual email service)
   setTimeout(function() {
-    // Create mailto link
-    const mailtoLink = `mailto:shaleelsandeepa@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+    // Create Gmail web compose link
+    const gmailSubject = encodeURIComponent(subject);
+    const gmailBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=shaleelsandeepa@gmail.com&su=${gmailSubject}&body=${gmailBody}`;
     
-    // Open email client
-    window.location.href = mailtoLink;
+    // Open Gmail in new tab/window
+    window.open(gmailLink, '_blank');
     
     // Show success message
-    showStatus('success', 'Your email client should open now. If not, please send an email directly to shaleelsandeepa@gmail.com');
+    showStatus('success', 'Gmail should open in a new tab. If not, please check your popup blocker settings.');
     
     // Reset form
     form.reset();
