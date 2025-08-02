@@ -860,17 +860,47 @@
         }
       }).catch(error => {
         console.log('Error:', error);
-        // Fallback to mailto
-        const name = form.user_name.value;
-        const email = form.user_email.value;
-        const subject = form.subject.value;
-        const message = form.message.value;
-        
-        const mailtoLink = `mailto:shaleelsandeepa@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
-        window.location.href = mailtoLink;
-        
-        showStatus('success', 'Your email client should open now. If not, please send an email directly to shaleelsandeepa@gmail.com');
-      }).finally(() => {
+		// Fallback to mailto
+			const name = form.user_name.value;
+			const email = form.user_email.value;
+			const subject = form.subject.value;
+			const message = form.message.value;
+
+		try {
+		  // Create Gmail web compose link
+			const gmailSubject = encodeURIComponent(subject);
+			const gmailBody = encodeURIComponent(`Message from my portfolio\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+			const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=shaleelsandeepa@gmail.com&su=${gmailSubject}&body=${gmailBody}`;
+			
+			// Open Gmail in new tab/window
+			window.open(gmailLink, '_blank');
+			
+			// Show success message
+			showStatus('success', 'Gmail should open in a new tab. If not, please check your popup blocker settings.');
+			
+			// Reset form
+			form.reset();
+			
+			// Reset button state
+			btnText.style.display = 'inline-block';
+			btnLoader.style.display = 'none';
+			submitBtn.disabled = false;
+
+		} catch (emailError) {
+		  	console.error('EmailJS Error:', emailError);
+			// Fallback to mailto link
+			const mailtoLink = `mailto:shaleelsandeepa@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+			window.location.href = mailtoLink;
+			showStatus('success', 'Your email client should open now. If not, please send an email directly to shaleelsandeepa@gmail.com');
+			form.reset();
+			btnText.style.display = 'inline-block';
+			btnLoader.style.display = 'none';
+			submitBtn.disabled = false;
+		}
+
+
+      
+	}).finally(() => {
         // Reset button state
         btnText.style.display = 'inline-block';
         btnLoader.style.display = 'none';
